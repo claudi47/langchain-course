@@ -21,14 +21,25 @@ def main():
     """
 
     summary_prompt_template = PromptTemplate(
+        # The input_variables parameter tells the PromptTemplate which placeholder in the template string
+        # need to be replaced with actual values when the template is used
         input_variables=["information"],
         template=summary_template,
     )
 
     llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
     # llm = ChatOllama(temperature=0, model="gemma3:4b")
+
+    # The | operator is part of the LangChain Expression Language(LCEL) syntax.
+    # It creates a chain by connecting components in a pipeline where the output of the left component becomes 
+    # the input of the right component.
+    # Furthermore, it makes the code more mantainable, allows for easy composition of complex pipelines,
+    # provides built-in error handling and enables advanced features like streaming and parallel execution.
     chain = summary_prompt_template | llm
 
+    # invoke() passes the input dict to the PromptTemplate, which formats the template by substituting
+    # {information} with the provided value. Then, the formatted prompt is passed to the LLM, wich generates
+    # and returns the response
     response = chain.invoke(input={"information": information})
     print(response.content)
 
