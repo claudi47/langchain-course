@@ -53,12 +53,13 @@ def get_tool_descriptions(tools_dict):
 tool_descriptions = get_tool_descriptions(tools)
 tool_names = ", ".join(tools.keys())
 
-react_prompt = f"""
+react_prompt = f"""/no_think
 STRICT RULES — you must follow these exactly:
 1. NEVER guess or assume any product price. You MUST call get_product_price first to get the real price.
 2. Only call apply_discount AFTER you have received a price from get_product_price. Pass the exact price returned by get_product_price — do NOT pass a made-up number.
 3. NEVER calculate discounts yourself using math. Always use the apply_discount tool.
 4. If the user does not specify a discount tier, ask them which tier to use — do NOT assume one.
+5. Do not output <think> blocks or hidden reasoning. Keep each Thought to one short sentence.
 
 Answer the following questions as best you can. You have access to the following tools:
 
@@ -87,11 +88,18 @@ Thought:"""
 
 @traceable(name="Ollama Chat", run_type="llm")
 def ollama_chat_traced(model, messages, options):
-    return ollama.chat(model=model, messages=messages, options=options)
+    return ollama.chat(model=model, messages=messages, options=options, think=False)
+
+
+def clean_model_output(content: str) -> str:
+    """Remove model-specific thinking text before parsing the ReAct protocol."""
+    content = re.sub(r"<think>.*?</think>\s*", "", content, flags=re.DOTALL)
+    if "</think>" in content:
+        content = content.split("</think>", 1)[1]
+    return content.strip()
 
 
 # --- Agent Loop ---
-
 
 @traceable(name="Ollama Agent Loop")
 def run_agent(question: str):
@@ -114,11 +122,11 @@ def run_agent(question: str):
             messages=[{"role": "user", "content": full_prompt}],
             options={"stop": ["\nObservation"], "temperature": 0},
         )
-        output = response.message.content
+        output = clean_model_output(response.message.content)
         print(f"LLM Output:\n{output}")
 
-        print(f"  [Parsing] Looking for Final Answer in LLM output...")
-        final_answer_match = re.search(r"Final Answer:\s*(.+)", output)
+        print("  [Parsing] Looking for Final Answer in LLM output...")
+        final_answer_match = re.search(r"Final Answer:\s*(.+)", output, re.DOTALL)
         if final_answer_match:
             final_answer = final_answer_match.group(1).strip()
             print(f"  [Parsed] Final Answer: {final_answer}")
@@ -129,10 +137,12 @@ def run_agent(question: str):
 
 
         # CHANGE 6: Parse tool calls from raw text with regex — fragile if LLM doesn't follow format.
-        print(f"  [Parsing] Looking for Action and Action Input in LLM output...")
+        print("  [Parsing] Looking for Action and Action Input in LLM output...")
 
-        action_match = re.search(r"Action:\s*(.+)", output)
-        action_input_match = re.search(r"Action Input:\s*(.+)", output)
+        action_match = re.search(r"^Action:\s*(.+)$", output, re.MULTILINE)
+        action_input_match = re.search(
+            r"^Action Input:\s*(.+)$", output, re.MULTILINE
+        )
 
         if not action_match or not action_input_match:
             print(
@@ -159,7 +169,7 @@ def run_agent(question: str):
         print(f"  [Tool Result] {observation}")
 
         # CHANGE 7: History is one growing string re-sent every iteration (replaces messages.append).
-        scratchpad += f"{output}\nObservation: {observation}\nThought:"
+        scratchpad += f"{output}\nObservation: {observation}\nThought: "
 
 
     print("ERROR: Max iterations reached without a final answer")
