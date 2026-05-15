@@ -2,11 +2,11 @@
 import re
 import inspect
 from dotenv import load_dotenv
+import ollama
+from langsmith import traceable
 
 load_dotenv()
 
-import ollama
-from langsmith import traceable
 
 MAX_ITERATIONS = 10
 MODEL = "qwen3:4b"
