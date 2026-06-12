@@ -1,16 +1,23 @@
 [project]
-name = "langchain-course"
+name = "langgraph-course"
 version = "0.1.0"
-description = "Add your description here"
+description = ""
+authors = [{ name = "Eden Marco", email = "emarco177@gmail.com" }]
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 dependencies = [
-    "black>=26.3.1",
-    "isort>=8.0.1",
-    "langchain>=1.2.15",
-    "langchain-community>=0.4.1",
-    "langchain-groq>=1.0.0",
-    "langchain-ollama>=1.0.0",
-    "langchain-pinecone>=0.2.13",
-    "python-dotenv>=1.2.2",
+    "langchain>=0.3.25",
+    "langchain-groq>=0.3.0",
+    "langchain-tavily>=0.2.0",
+    "langgraph>=0.4.7",
+    "python-dotenv>=1.1.0",
 ]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+]
+
+[tool.uv]
+package = false
