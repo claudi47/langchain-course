@@ -10,7 +10,7 @@ load_dotenv()
 
 AGENT_REASON="agent_reason"
 ACT= "act"
-LAST = -1
+LAST = -1 # to reference the last message in the state
 
 
 def should_continue(state: MessagesState) -> str:
