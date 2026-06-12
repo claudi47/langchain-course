@@ -1,40 +1,74 @@
+from typing import TypedDict, Annotated
+
 from dotenv import load_dotenv
-from typing import cast
 
-from langchain_core.messages import HumanMessage, AIMessage
-from langgraph.graph import MessagesState, StateGraph,END
+from langchain_core.messages import BaseMessage, HumanMessage
+from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
 
-from nodes import run_agent_reasoning, tool_node
+from chains import generate_chain, reflect_chain
 
 load_dotenv()
 
-AGENT_REASON="agent_reason"
-ACT= "act"
-LAST = -1 # to reference the last message in the state
+# Qui vi è la formula di LangGraph per aggiornare lo stato:
+# Annotated permette di aggiungere metadati alla lista di messaggi, tramite add_messages
+# add_messages è un REDUCER, ovvero una funzione che prende lo stato precedente e lo aggiorna
+# in questo caso aggiungendo un nuovo messaggio alla lista di quelli esistenti
+class MessageGraph(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
 
 
-def should_continue(state: MessagesState) -> str:
-    last = cast(AIMessage, state["messages"][LAST])
-    if not last.tool_calls:
+REFLECT = "reflect"
+GENERATE = "generate"
+
+# Quando un nodo ritorna la lista dei messaggi, LangGraph internamente la aggiorna
+# chiamando proprio add_messages, che ne appende il risultato a quelli già presenti
+def generation_node(state: MessageGraph):
+    return {"messages": [generate_chain.invoke({"messages": state["messages"]})]}
+
+
+def reflection_node(state: MessageGraph):
+    res = reflect_chain.invoke({"messages": state["messages"]})
+    return {"messages": [HumanMessage(content=res.content)]}
+
+
+builder = StateGraph(state_schema=MessageGraph)
+builder.add_node(GENERATE, generation_node)
+builder.add_node(REFLECT, reflection_node)
+builder.set_entry_point(GENERATE)
+
+
+def should_continue(state: MessageGraph):
+    if len(state["messages"]) > 6:
         return END
-    return ACT
+    return REFLECT
 
-flow = StateGraph(MessagesState)
+# Qui stiamo collegando i nodi, specificando che dopo GENERATE vogliamo valutare se continuare o terminare
+# dopo REFLECT invece vogliamo sempre tornare a GENERATE, creando così un ciclo di generazione e riflessione
+# fino a quando non decidiamo di terminare
+builder.add_conditional_edges(GENERATE, should_continue, path_map={END: END, REFLECT: REFLECT})
+builder.add_edge(REFLECT, GENERATE)
 
-flow.add_node(AGENT_REASON, run_agent_reasoning)
-flow.set_entry_point(AGENT_REASON)
-flow.add_node(ACT, tool_node)
-
-flow.add_conditional_edges(AGENT_REASON, should_continue, {
-    END:END,
-    ACT:ACT})
-
-flow.add_edge(ACT, AGENT_REASON)
-
-app = flow.compile()
-app.get_graph().draw_mermaid_png(output_file_path="flow.png")
+graph = builder.compile()
+print(graph.get_graph().draw_mermaid())
+graph.get_graph().print_ascii()
 
 if __name__ == "__main__":
-    print("Hello ReAct LangGraph with Function Calling")
-    res = app.invoke({"messages": [HumanMessage(content="What is the temperature in Tokyo? List it and then triple it")]})
-    print(res["messages"][LAST].content)
+    print("Hello LangGraph")
+    inputs: MessageGraph = {
+        "messages": [
+            HumanMessage(
+                content="""Make this tweet better:"
+                                    @LangChainAI
+            — newly Tool Calling feature is seriously underrated.
+
+            After a long wait, it's  here- making the implementation of agents across different models with function calling - super easy.
+
+            Made a video covering their newest blog post
+
+                                  """
+            )
+        ]
+    }
+    response = graph.invoke(inputs)
+    print(response)

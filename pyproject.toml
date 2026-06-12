@@ -6,6 +6,7 @@ authors = [{ name = "Eden Marco", email = "emarco177@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "grandalf>=0.8",
     "langchain>=0.3.25",
     "langchain-groq>=0.3.0",
     "langchain-tavily>=0.2.0",
