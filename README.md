@@ -1,105 +1,146 @@
-# 🦜🪞 LangGraph Reflection Agent
+# Reflexion Agent with LangGraph 🦜🕸️
 
-This repository contains a reflection-style agent architecture built with LangGraph that improves output quality through self-critique and refinement.
+Implementation of a sophisticated Reflexion agent using LangGraph and LangChain, designed to generate high-quality responses through self-reflection and iterative improvement.
 
-## ✨ Overview
-
-The reflection agent uses a feedback loop between a generation component and a reflection component to iteratively improve responses to user queries. In this implementation, we've created a Twitter assistant that enhances tweets through multiple rounds of critique and revision.
+This project demonstrates advanced AI agent capabilities using LangGraph's state-of-the-art control flow mechanisms for self-reflection and response refinement.
 
 ```mermaid
+---
+config:
+  flowchart:
+    curve: linear
+---
 graph LR;
-    __start__([__start__]):::first
-    generate(generate)
-    reflect(reflect)
-    __end__([__end__]):::last
-    __start__ --> generate;
-    generate --> reflect;
-    reflect -.-> generate;
-    generate -.-> __end__;
-    classDef default fill:#f2f0ff,line-height:1.2
-    classDef first fill-opacity:0
-    classDef last fill:#bfb6fc
+        __start__([<p>__start__</p>]):::first
+        draft(draft)
+        execute_tools(execute_tools)
+        revise(revise)
+        __end__([<p>__end__</p>]):::last
+        __start__ --> draft;
+        draft --> execute_tools;
+        execute_tools --> revise;
+        revise -.-> draft;
+        revise -.-> execute_tools;
+        revise -.-> __end__;
+        classDef default fill:#f2f0ff,line-height:1.2
+        classDef first fill-opacity:0
+        classDef last fill:#bfb6fc
 ```
 [![udemy](https://img.shields.io/badge/LangGraph🦜🔗%20Udemy%20Course-%20Coupon%20%2412.99-brightgreen)](https://www.udemy.com/course/langgraph/?couponCode=APRIL-2025)
 
-## 🔄 How It Works
+## Features
 
-1. **Generate**: The initial component creates a response (in our case, a tweet) based on the user's input
-2. **Reflect**: The reflection component evaluates the generated content and provides specific feedback for improvement
-3. **Loop**: The generation component refines its output based on the reflection's feedback
-4. **Termination**: The process ends after a predetermined number of iterations (currently set to 6)
+- **Self-Reflection**: Implements sophisticated reflection mechanisms for response improvement
+- **Iterative Refinement**: Uses a graph-based approach to iteratively enhance responses
+- **Production-Ready**: Built with scalability and real-world applications in mind
+- **Integrated Search**: Leverages Tavily search for enhanced response accuracy
+- **Structured Output**: Uses Pydantic models for reliable data handling
 
-This approach creates a self-improving system that produces higher quality outputs through deliberate reflection.
+## Architecture
 
-## 💻 Installation
+The agent uses a graph-based architecture with the following components:
+
+- **Entry Point**: `draft` node for initial response generation
+- **Processing Nodes**: `execute_tools` and `revise` for refinement
+- **Maximum Iterations**: 2 (configurable)
+- **Chain Components**: First responder and revisor using GPT-4
+- **Tool Integration**: Tavily Search for web research
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file:
 
 ```bash
-# Clone the repository
-git clone https://github.com/emarco177/langgraph-course.git
-cd langgraph-course
-git checkout project/reflection-agent
+OPENAI_API_KEY=your_openai_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
+LANGCHAIN_API_KEY=your_langchain_api_key_here  # Optional, for tracing
+LANGCHAIN_TRACING_V2=true                      # Optional
+LANGCHAIN_PROJECT=reflexion agent               # Optional
+```
 
-# Install dependencies using Poetry
+> **Important Note**: If you enable tracing by setting `LANGCHAIN_TRACING_V2=true`, you must have a valid LangSmith API key set in `LANGCHAIN_API_KEY`. Without a valid API key, the application will throw an error. If you don't need tracing, simply remove or comment out these environment variables.
+
+## Run Locally
+
+Clone the project:
+
+```bash
+git clone <repository-url>
+cd reflexion-agent
+```
+
+Install dependencies:
+
+```bash
 poetry install
 ```
 
-## 📁 Project Structure
+Start the agent:
 
-```
-reflection-agent/
-├── chains.py         # Defines the prompt chains for generation and reflection
-├── main.py           # Implements the core LangGraph structure
-├── pyproject.toml    # Project dependencies and configuration
-└── README.md         # This documentation
+```bash
+poetry run python main.py
 ```
 
-## 🛠️ Implementation Details
+## Development Setup
 
-### Main Components
+1. Get your API keys:
+   - [OpenAI Platform](https://platform.openai.com/) for GPT-4 access
+   - [Tavily](https://tavily.com/) for search functionality
+   - [LangSmith](https://smith.langchain.com/) (optional) for tracing
 
-The reflection agent is built with two primary nodes:
+2. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
 
-1. **Generation Node** (in `chains.py`):
-   - Uses a specialized prompt for creating Twitter content
-   - Responds to critique by refining previously generated content
+3. Edit `.env` with your API keys
 
-2. **Reflection Node** (in `chains.py`):
-   - Critiques the generated content against quality criteria
-   - Provides specific recommendations for improvement
+## Running Tests
 
-## 🔍 Example Usage
+To run tests, use the following command:
 
-```python
-from langchain_core.messages import HumanMessage
-from main import graph
-
-# Create input prompt
-input_tweet = HumanMessage(content="""Make this tweet better:
-@LangChainAI — newly Tool Calling feature is seriously underrated.
-After a long wait, it's here- making the implementation of agents across different models with function calling - super easy.
-Made a video covering their newest blog post""")
-
-# Run the reflection agent
-improved_tweet = graph.invoke(input_tweet)
-print(improved_tweet)
+```bash
+poetry run pytest . -s -v
 ```
 
-## 📚 Video Lessons
+## Acknowledgements
 
-This project is built incrementally across multiple video lessons. Each commit represents a specific lesson in the series:
+This project builds upon:
+- [LangGraph](https://langchain-ai.github.io/langgraph/tutorials/reflexion/reflexion/) for agent control flow
+- [LangChain](https://github.com/langchain-ai/langchain) for LLM interactions
+- [Tavily API](https://tavily.com/) for web search capabilities
 
-| Lesson | Commit | Description |
-|--------|--------|-------------|
-| 1 | [adbee18](https://github.com/emarco177/langgaph-course/commit/adbee18) | **Getting Started**: Initial setup for the reflection agent |
-| 2 | [aab1105](https://github.com/emarco177/langgaph-course/commit/aab1105) | **Project Structure**: Adding core files and dependencies with Poetry |
-| 3 | [d2f15d2](https://github.com/emarco177/langgaph-course/commit/d2f15d2) | **Chain Implementation**: Building Twitter influencer prompts and generation logic |
-| 4 | [ed491a6](https://github.com/emarco177/langgaph-course/commit/ed491a6) | **Graph Implementation**: Connecting nodes with conditional logic for feedback loops |
+## Development Timeline
 
-Each lesson builds on the previous one, demonstrating how to incrementally build a reflection agent architecture using LangGraph.
+This project follows the structure of the "LangGraph Course" lectures, demonstrating key concepts in building a Reflexion Agent:
 
-## 👏 Acknowledgment
+1. **[Add initial project structure](https://github.com/emarco177/langgaph-course/commit/338cb56)** - Corresponds to **Lecture 22: Project Setup**
+   * Set up the foundation with project configuration files (.gitignore, main.py, pyproject.toml, poetry.lock)
+   
+2. **[Create chains for AI-powered research functionality](https://github.com/emarco177/langgaph-course/commit/e6dd3fc)** - Corresponds to **Lecture 23: Actor Agent**
+   * Implemented the first component of our agent architecture - the Actor
+   * Added chains.py with prompt templates for generating detailed answers
+   * Created schemas.py with Pydantic models for structured data handling
+   
+3. **[Enhance chains for answer revision capabilities](https://github.com/emarco177/langgaph-course/commit/8c0b27b)** - Corresponds to **Lecture 24: Revisor Agent**
+   * Implemented the second component - the Revisor for self-reflection
+   * Added ReviseAnswer class to schemas.py for improved response structure
+   * Updated chain prompts to incorporate critique and citation requirements
+   
+4. **[Add dependencies and tools for graph nodes](https://github.com/emarco177/langgaph-course/commit/a092b97)** - Preparation for Graph Implementation
+   * Integrated search functionality to enhance response accuracy
+   * Added required dependencies for the complete graph workflow
+   
+5. **[Implement the complete message graph](https://github.com/emarco177/langgaph-course/commit/bb79ec6)** - Corresponds to **Lecture 28: Building our LangGraph Graph**
+   * Connected Actor and Revisor agents in a complete LangGraph workflow
+   * Defined graph nodes for drafting, tool execution, and revision
+   * Established state management and conditional edge routing for reflection
+   
+6. **[Added readme](https://github.com/emarco177/langgaph-course/commit/112b808)** - Documentation of the final project
+   * Overview of what was built in **Lecture 21: What are we building?**
+   * Detailed explanation of the agent architecture and implementation
 
-This reflection agent implementation is based on the concepts and patterns described in the LangGraph documentation. For more information about reflection agents, visit the [LangGraph Reflection Tutorial](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/).
+This progression demonstrates the complete development cycle of a Reflexion Agent using LangGraph, following the course structure from setup to implementation of chains, agents, and finally constructing the complete graph.
 
 ## 🔗 Links
 [![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://www.udemy.com/course/langgraph/?referralCode=FEA50E8CBA24ECD48212)
