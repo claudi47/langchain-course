@@ -6,18 +6,25 @@ authors = [{ name = "Eden Marco", email = "emarco177@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "beautifulsoup4",
     "langchain",
-    "langgraph",
+    "langchain-chroma",
+    "langchain-community",
     "langchain-groq",
-    "pydantic",
+    "langchain-ollama",
+    "langchain-tavily>=0.1.5",
+    "langchain-text-splitters",
+    "langgraph",
     "python-dotenv",
-    "langchain-tavily",
+    "tavily-python",
+    "tiktoken",
 ]
 
 [dependency-groups]
 dev = [
     "black",
     "isort",
+    "pytest",
 ]
 
 [tool.uv]

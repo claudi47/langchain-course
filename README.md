@@ -1,148 +1,146 @@
-# Reflexion Agent with LangGraph 🦜🕸️
+# Agentic RAG with LangGraph 🦜🔍
 
-Implementation of a sophisticated Reflexion agent using LangGraph and LangChain, designed to generate high-quality responses through self-reflection and iterative improvement.
+Implementation of Reflective RAG, Self-RAG & Adaptive RAG tailored towards developers and production-oriented applications for learning LangGraph🦜🕸️.
 
-This project demonstrates advanced AI agent capabilities using LangGraph's state-of-the-art control flow mechanisms for self-reflection and response refinement.
+This repository contains a refactored version of the original [LangChain's Cookbook](https://github.com/mistralai/cookbook/tree/main/third_party/langchain),
 
-```mermaid
----
-config:
-  flowchart:
-    curve: linear
----
-graph LR;
-        __start__([<p>__start__</p>]):::first
-        draft(draft)
-        execute_tools(execute_tools)
-        revise(revise)
-        __end__([<p>__end__</p>]):::last
-        __start__ --> draft;
-        draft --> execute_tools;
-        execute_tools --> revise;
-        revise -.-> draft;
-        revise -.-> execute_tools;
-        revise -.-> __end__;
-        classDef default fill:#f2f0ff,line-height:1.2
-        classDef first fill-opacity:0
-        classDef last fill:#bfb6fc
-```
+See Original YouTube video:[Advance RAG control flow with Mistral and LangChain](https://www.youtube.com/watch?v=sgnrL7yo1TE)
+
+of [Sophia Young](https://x.com/sophiamyang) from Mistral & [Lance Martin](https://x.com/RLanceMartin) from LangChain
+
+![Logo](https://github.com/emarco177/langgraph-course/blob/project/agentic-rag/static/Langgraph%20Adaptive%20Rag.png)
 [![udemy](https://img.shields.io/badge/LangGraph🦜🔗%20Udemy%20Course-%20Coupon%20%2412.99-brightgreen)](https://www.udemy.com/course/langgraph/?couponCode=APRIL-2025)
+
 
 ## Features
 
-- **Self-Reflection**: Implements sophisticated reflection mechanisms for response improvement
-- **Iterative Refinement**: Uses a graph-based approach to iteratively enhance responses
-- **Production-Ready**: Built with scalability and real-world applications in mind
-- **Integrated Search**: Leverages Tavily search for enhanced response accuracy
-- **Structured Output**: Uses Pydantic models for reliable data handling
+- **Refactored Notebooks**: The original LangChain notebooks have been refactored to enhance readability, maintainability, and usability for developers.
+- **Production-Oriented**: The codebase is designed with a focus on production readiness, allowing developers to seamlessly transition from experimentation to deployment.
+- **Test Coverage**: Comprehensive test coverage ensures the reliability and stability of the application, enabling developers to validate their implementations effectively.
+- **Documentation**: Detailed documentation and branches guides developers through setting up the environment, understanding the codebase, and utilizing LangGraph effectively.
 
-## Architecture
 
-The agent uses a graph-based architecture with the following components:
+## What You'll Learn
 
-- **Entry Point**: `draft` node for initial response generation
-- **Processing Nodes**: `execute_tools` and `revise` for refinement
-- **Maximum Iterations**: 2 (configurable)
-- **Chain Components**: First responder and revisor using GPT-4
-- **Tool Integration**: Tavily Search for web research
+- **Agentic RAG Implementation**: Build a system that can make intelligent decisions about retrieving information
+- **Graph-Based Control Flow**: Use LangGraph to create sophisticated control flows for your RAG pipeline
+- **Document Relevance Evaluation**: Implement logic to grade document relevance and detect hallucinations
+- **Adaptive Information Retrieval**: Create a system that can switch between local knowledge and web search
+- **State Management**: Implement proper state handling for complex information flows
+
+## Tutorial Structure
+
+This repository is organized as a series of commits, each representing a video lesson in building the Agentic RAG system:
+
+| Lesson # | Commit | Description | Key Components |
+|----------|--------|-------------|----------------|
+| 1 | [**Start Here**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/5b2b18e) | Introduction to the course and Agentic RAG concepts | Overview of the project; Introduction to LangGraph and Agentic RAG architecture |
+| 2 | [**Project Structure**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/2693185) | Setting up the project foundation | Initialize project structure; Configure uv for dependency management |
+| 3 | [**Ingestion**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/513e3cf) | Setting up the vector database | Create ingestion pipeline; Implement vector store with Chroma and Ollama embeddings |
+| 4 | [**State**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/03f79ae) | Defining the state management | Create GraphState class; Set up typed dictionaries for state tracking |
+| 5 | [**Retrieve Node**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/c2d71c7) | Implementing the document retrieval | Build retrieve node; Connect retrieval to vector database |
+| 6 | [**Grade Documents Node**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/9107e7a) | Evaluating document relevance | Create document grading functionality; Implement decision logic for document relevance |
+| 7 | [**Web Search with Tavily**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/6d4fdc4) | Adding external search capability | Integrate Tavily search API; Implement fallback for insufficient local knowledge |
+| 8 | [**Generation Node**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/bc57b63) | Creating the answer generation component | Build generate node; Implement context-aware response generation |
+| 9 | [**Graph**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/a450f9b) | Constructing the complete LangGraph workflow | Connect all nodes into workflow; Implement conditional edges for adaptive behavior |
+| 10 | [**Self-RAG**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/5400fb7) | Adding self-evaluation capabilities | Implement hallucination detection; Create feedback loops for answer improvement |
+| 11 | [**Router**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/034e53f) | Smart query routing | Create intelligent routing between retrieval and web search; Optimize entry point for different query types |
+| 12 | [**Formatting**](https://github.com/emarco177/langgraph-course/tree/project/agentic-rag/commit/d9490ca) | Final code formatting and cleanup | Code optimization; Final documentation improvements |
 
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file:
 
 ```bash
-OPENAI_API_KEY=your_openai_api_key_here
-TAVILY_API_KEY=your_tavily_api_key_here
-LANGCHAIN_API_KEY=your_langchain_api_key_here  # Optional, for tracing
-LANGCHAIN_TRACING_V2=true                      # Optional
-LANGCHAIN_PROJECT=reflexion agent               # Optional
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=your_groq_model_here                # e.g. llama-3.3-70b-versatile
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text        # Local Ollama model for embeddings
+TAVILY_API_KEY=your_tavily_api_key_here        # For web search capabilities
+LANGSMITH_API_KEY=your_langsmith_api_key_here  # Optional, for tracing
+LANGSMITH_TRACING=true                         # Optional
+LANGSMITH_PROJECT=agentic-rag                  # Optional
 ```
 
-> **Important Note**: If you enable tracing by setting `LANGCHAIN_TRACING_V2=true`, you must have a valid LangSmith API key set in `LANGCHAIN_API_KEY`. Without a valid API key, the application will throw an error. If you don't need tracing, simply remove or comment out these environment variables.
+> **Important Note**: If you enable tracing by setting `LANGSMITH_TRACING=true`, you must have a valid LangSmith API key set in `LANGSMITH_API_KEY`. Without a valid API key, the application will throw an error.
 
-## Run Locally
+## Getting Started
 
-Clone the project:
+Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd reflexion-agent
+git clone https://github.com/emarco177/langgraph-course.git
+cd langgraph-course
+git checkout project/agentic-rag
 ```
 
 Install dependencies:
 
 ```bash
-poetry install
+uv sync
 ```
 
-Start the agent:
+Follow along with each commit to learn the process of building an Agentic RAG system:
 
 ```bash
-poetry run python main.py
+# View all commits in the tutorial
+git log --oneline
+
+# Check out specific lessons:
+git checkout 5b2b18e  # Lesson 1: Start Here
+git checkout 2693185  # Lesson 2: Project Structure
+git checkout 513e3cf  # Lesson 3: Ingestion
+git checkout 03f79ae  # Lesson 4: State
+git checkout c2d71c7  # Lesson 5: Retrieve Node
 ```
 
-## Development Setup
+## Prerequisites
 
-1. Get your API keys:
-   - [OpenAI Platform](https://platform.openai.com/) for GPT-4 access
-   - [Tavily](https://tavily.com/) for search functionality
-   - [LangSmith](https://smith.langchain.com/) (optional) for tracing
+- Python 3.10+
+- Basic understanding of LLMs and RAG systems
+- Familiarity with Python and vector databases (helpful but not required)
 
-2. Copy the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
+## Run Locally
 
-3. Edit `.env` with your API keys
+Clone the project
+
+```bash
+  git clone https://github.com/emarco177/langgraph-course.git
+```
+
+Go to the project directory
+
+```bash
+  cd langgraph-course
+```
+
+Install dependencies
+
+```bash
+  uv sync
+```
+
+Start the Agentic Rag flow
+
+```bash
+  uv run main.py
+```
 
 ## Running Tests
 
-To run tests, use the following command:
+To run tests, run the following command
 
 ```bash
-poetry run pytest . -s -v
+  uv run pytest . -s -v
 ```
-
 ## Acknowledgements
 
-This project builds upon:
-- [LangGraph](https://langchain-ai.github.io/langgraph/tutorials/reflexion/reflexion/) for agent control flow
-- [LangChain](https://github.com/langchain-ai/langchain) for LLM interactions
-- [Tavily API](https://tavily.com/) for web search capabilities
+Original LangChain repository: [LangChain Cookbook](https://github.com/mistralai/cookbook/tree/main/third_party/langchain)
+By [Sophia Young](https://x.com/sophiamyang) from Mistral & [Lance Martin](https://x.com/RLanceMartin) from LangChain
+![Logo](https://github.com/emarco177/langgraph-course/blob/project/agentic-rag/static/LangChain-logo.png)
 
-## Development Timeline
 
-This project follows the structure of the "LangGraph Course" lectures, demonstrating key concepts in building a Reflexion Agent:
-
-1. **[Add initial project structure](https://github.com/emarco177/langgaph-course/commit/338cb56)** - Corresponds to **Lecture 22: Project Setup**
-   * Set up the foundation with project configuration files (.gitignore, main.py, pyproject.toml, poetry.lock)
-   
-2. **[Create chains for AI-powered research functionality](https://github.com/emarco177/langgaph-course/commit/e6dd3fc)** - Corresponds to **Lecture 23: Actor Agent**
-   * Implemented the first component of our agent architecture - the Actor
-   * Added chains.py with prompt templates for generating detailed answers
-   * Created schemas.py with Pydantic models for structured data handling
-   
-3. **[Enhance chains for answer revision capabilities](https://github.com/emarco177/langgaph-course/commit/8c0b27b)** - Corresponds to **Lecture 24: Revisor Agent**
-   * Implemented the second component - the Revisor for self-reflection
-   * Added ReviseAnswer class to schemas.py for improved response structure
-   * Updated chain prompts to incorporate critique and citation requirements
-   
-4. **[Add dependencies and tools for graph nodes](https://github.com/emarco177/langgaph-course/commit/a092b97)** - Preparation for Graph Implementation
-   * Integrated search functionality to enhance response accuracy
-   * Added required dependencies for the complete graph workflow
-   
-5. **[Implement the complete message graph](https://github.com/emarco177/langgaph-course/commit/bb79ec6)** - Corresponds to **Lecture 28: Building our LangGraph Graph**
-   * Connected Actor and Revisor agents in a complete LangGraph workflow
-   * Defined graph nodes for drafting, tool execution, and revision
-   * Established state management and conditional edge routing for reflection
-   
-6. **[Added readme](https://github.com/emarco177/langgaph-course/commit/112b808)** - Documentation of the final project
-   * Overview of what was built in **Lecture 21: What are we building?**
-   * Detailed explanation of the agent architecture and implementation
-
-This progression demonstrates the complete development cycle of a Reflexion Agent using LangGraph, following the course structure from setup to implementation of chains, agents, and finally constructing the complete graph.
 
 ## 🔗 Links
 [![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://www.udemy.com/course/langgraph/?referralCode=FEA50E8CBA24ECD48212)
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/eden-marco/)
-[![Twitter Follow](https://img.shields.io/twitter/follow/EdenEmarco177?style=social)](https://twitter.com/EdenEmarco177)
+[![Twitter Follow](https://img.shields.io/twitter/follow/EdenEmarco177?style=social)](https://twitter.com/EdenEmarco177) 
