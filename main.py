@@ -21,6 +21,8 @@ def revise_node(state: MessagesState):
 
 def event_loop(state: MessagesState) -> str:
     """Determine whether to continue or end based on iteration count."""
+    # isinstance conta il numero di messaggi di tipo ToolMessage nella lista dei messaggi
+    # il generatore torna True -> 1 e False -> 0
     count_tool_visits = sum(
         isinstance(item, ToolMessage) for item in state["messages"]
     )
@@ -41,8 +43,6 @@ builder.add_conditional_edges("revise", event_loop, ["execute_tools", END])
 graph = builder.compile()
 
 print(graph.get_graph().draw_mermaid())
-
-
 
 res = graph.invoke(
     {
